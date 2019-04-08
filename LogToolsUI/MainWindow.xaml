@@ -1,0 +1,65 @@
+﻿<Window x:Class="LogToolsUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LogToolsUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.Resources>
+            <Style x:Key="box" TargetType="ListBox">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBox}">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <WrapPanel Orientation="Horizontal" IsItemsHost="True" ScrollViewer.CanContentScroll="True"/>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="boxItem" TargetType="ListBoxItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderThickness="1" BorderBrush="Black">
+                                <Label Height="40" Width="40" Content="{Binding PathStr}">
+                                </Label>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style >
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="28*"/>
+            <ColumnDefinition Width="71*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52*"/>
+                <RowDefinition Height="367*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBox Width="180"/>
+                <Button Content="Ok"/>
+            </StackPanel>
+            <DockPanel Grid.Row="1">
+                <ListBox Style="{StaticResource box}" ItemContainerStyle="{StaticResource boxItem}"/>
+            </DockPanel>
+        </Grid>
+        <DockPanel Grid.Column="1">
+            <Label Name="lab" DockPanel.Dock="Top" Height="50" Padding="2">
+                <TextBox Name="txt" 
+                         TextChanged="Txt_TextChanged" 
+                         Width="{Binding ElementName=lab,Path=ActualWidth}" 
+                         Height="{Binding ElementName=lab,Path=ActualHeight}"/>
+            </Label>
+            <DataGrid DockPanel.Dock="Bottom" 
+                      Name="dataGrid" />
+        </DockPanel>
+    </Grid>
+</Window>
