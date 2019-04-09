@@ -45,7 +45,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <TextBox Width="180"/>
-                <Button Content="Ok"/>
+                <Button Content="Ok" Width="40" Height="22"/>
             </StackPanel>
             <DockPanel Grid.Row="1">
                 <ListBox Style="{StaticResource box}" ItemContainerStyle="{StaticResource boxItem}"/>
