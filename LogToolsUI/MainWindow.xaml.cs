@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LogDataLib;
 
 namespace LogToolsUI
 {
@@ -21,55 +22,71 @@ namespace LogToolsUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        class T1
-        {
-            public string PathStr { get; set; }
-            public T1(string path)
-            {
-                PathStr = path;
-            }
-        }
-        public MainWindow()
-        {
-            InitializeComponent();
-            Loaded += (s, e) =>
-            {
-                dataGrid.DataContext = makeTable();
-                listBox.ItemsSource = new List<T1>() { new T1("1"), new T1("t2") };
-            };
-        }
-        DataTable makeTable()
-        {
-            var ta = new DataTable();
-            new List<string>() { "CommandID", "ActionMode", "ServerID", "Time" }.ForEach(header => ta.Columns.Add(header));
-            new List<string>() { "40005", "20", "3" }.ForEach(row => ta.Rows.Add(row, "10", "a", "c"));
-            return ta;
-        }
+        public MainWindow() => InitializeComponent();
 
         private void Txt_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            Console.WriteLine(txt.Text);
         }
-       
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var txtStr = txt.Text;
             var a1 = txtStr.Split('&');
-            foreach (var item in a1)
+            if (dataGrid.DataContext is DataTable dable)
             {
+                foreach (var item in a1)
+                {
+                    dataGrid.DataContext = SelectTable(dable, item);
+                }
+            }
+        }
+        DataTable CurrentTable = new DataTable();
+        DataTable SelectTable(DataTable table, string SelectStr)
+        {
+            try
+            {
+                var ctable = table.Clone();
+                var rows = table.Select(SelectStr);
+                foreach (var row in rows)
+                {
+                    ctable.Rows.Add(row.ItemArray);
+                }
+                return ctable;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("输入字段错误");
+                return table;
+            }
 
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            dataGrid.DataContext = CurrentTable;
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.Multiselect = true;
+            dialog.Title = "请选择文件夹";
+            dialog.Filter = "文本文件(*.txt)|*.txt";
+            if (dialog.ShowDialog() == true)
+            {
+                listBox.ItemsSource = dialog.FileNames.Select(it => new PathMode(it.Split('\\').LastOrDefault()) { Path = it });
             }
         }
 
-        DataTable SelectTable(DataTable table,string SelectStr)
+        private void ListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var ctable = table.Clone();
-            var rows = table.Select(SelectStr);
-            foreach (var row in rows)
+            if (e.AddedItems[0] is PathMode pathm)
             {
-                ctable.Rows.Add(row.ItemArray);
+                var table = LogMoudle.GetTableByPath(pathm.Path);
+                dataGrid.DataContext = table;
+                CurrentTable = table;
             }
-            return ctable;
         }
     }
 }

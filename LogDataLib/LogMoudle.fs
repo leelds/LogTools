@@ -22,6 +22,7 @@ let getItem str =
     let commandID = mathcSometing str mCommandID
                    |> (fun str->str.Split(','))
                    |> (fun strs->if strs.Length <> 1 then strs.[1] else strs.[0])
+                   |> (fun s -> s.Replace("  ",""))
 
     let cmdType =  mathcSometing str mcmdType
                    |>(fun str->str.Split(':'))
