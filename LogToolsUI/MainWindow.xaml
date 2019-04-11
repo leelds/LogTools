@@ -5,9 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LogToolsUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="1000">
+    <Grid Name="grid">
         <Grid.Resources>
+            <Style x:Key="jsonCell" TargetType="DataGridCell">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border BorderBrush="Transparent" BorderThickness="1">
+                                <DockPanel>
+                                    <TextBox IsReadOnly="True" TextWrapping="Wrap" Text="JSON数据，右键选择查看详细信息">
+                                        <TextBox.ToolTip>
+                                                <DockPanel>
+                                                <Label MaxWidth="300" Padding="1">
+                                                    <ScrollViewer Padding="1" HorizontalScrollBarVisibility="Disabled">
+                                                        <TextBlock TextWrapping="Wrap" Text="{Binding JsonMsg}"/>
+                                                    </ScrollViewer>
+                                                </Label>
+                                            </DockPanel>
+                                        </TextBox.ToolTip>
+                                        <TextBox.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="详细信息" Tag="{Binding JsonMsg}" Click="MenuItem_Click"/>
+                                            </ContextMenu>
+                                        </TextBox.ContextMenu>
+                                    </TextBox>
+                                </DockPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="box" TargetType="ListBox">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -24,7 +52,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate>
-                            <Border BorderThickness="1"
+                            <Border Name="border" BorderThickness="1"
                                     Margin="3"
                                     BorderBrush="Transparent">
                                 <Label Height="105" 
@@ -43,6 +71,11 @@
                                     </DockPanel>
                                 </Label>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Selector.IsSelected" Value="true">
+                                    <Setter TargetName="border" Property="BorderBrush" Value="Black"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -223,16 +256,16 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type DataGridCell}">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Background="{TemplateBinding Background}"
-                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                            <Border 
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
                                 <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                                          Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-
+                                                  Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                  Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
                                 </ContentPresenter>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -353,14 +386,16 @@
                 <RowDefinition Height="52*"/>
                 <RowDefinition Height="367*"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBox Width="180" Height="22"/>
+            <DockPanel Grid.Row="0" >
                 <Button Content="浏览" 
                         Width="40"
                         Margin="2,0,2,0"
                         Click="Button_Click_2"
+                        DockPanel.Dock="Right"
                         Height="22"/>
-            </StackPanel>
+                <TextBlock Name="txtBox" Height="22" DockPanel.Dock="Left"/>
+                
+            </DockPanel>
             <DockPanel Grid.Row="1">
                 <ListBox Name="listBox" 
                          SelectionChanged="ListBox_OnSelectionChanged"
@@ -395,32 +430,39 @@
                              >
                             <Button.Template>
                                 <ControlTemplate>
-                                        <Border >
-                                            <Path  Data="M499.20001,332.79999 C583.67999,332.79999 652.79999,401.92001 652.79999,486.39999 652.79999,570.88 583.67999,640 499.20001,640 414.72,640 345.60001,570.88 345.60001,486.39999 345.60001,401.92001 414.72,332.79999 499.20001,332.79999 z M496.19055,293.49164 C462.03,293.82248 427.59998,303.19998 396.79999,322.56 307.20001,378.88 280.32001,499.20001 336.64001,588.79999 392.95999,678.40002 510.72,706.56 601.59998,650.23999 L686.08002,734.71997 C696.32001,744.96002 711.67999,744.96002 721.91998,734.71997 732.15997,724.47998 730.88,707.84002 721.91998,697.59997 L640,615.67999 C698.88,552.96002 707.84003,458.23999 661.76001,384 625.64001,325.19998 561.40625,292.85998 496.19055,293.49164 z M511.99994,1.1368684E-13 C600.39661,-1.9073483E-06 688.79333,22.864988 768,68.594969 926.41333,160.05496 1024,329.08002 1024,512 1024,694.91998 926.41339,863.94494 768.00006,955.40503 609.58673,1046.865 414.41339,1046.865 256,955.40503 97.58667,863.94507 0,694.91998 0,512 0,329.08002 97.586609,160.05502 255.99994,68.594999 335.2066,22.865004 423.60327,5.7220462E-06 511.99994,1.1368684E-13 z" 
+                                    <Border Name="btnBorder">
+                                        <Path  Data="M499.20001,332.79999 C583.67999,332.79999 652.79999,401.92001 652.79999,486.39999 652.79999,570.88 583.67999,640 499.20001,640 414.72,640 345.60001,570.88 345.60001,486.39999 345.60001,401.92001 414.72,332.79999 499.20001,332.79999 z M496.19055,293.49164 C462.03,293.82248 427.59998,303.19998 396.79999,322.56 307.20001,378.88 280.32001,499.20001 336.64001,588.79999 392.95999,678.40002 510.72,706.56 601.59998,650.23999 L686.08002,734.71997 C696.32001,744.96002 711.67999,744.96002 721.91998,734.71997 732.15997,724.47998 730.88,707.84002 721.91998,697.59997 L640,615.67999 C698.88,552.96002 707.84003,458.23999 661.76001,384 625.64001,325.19998 561.40625,292.85998 496.19055,293.49164 z M511.99994,1.1368684E-13 C600.39661,-1.9073483E-06 688.79333,22.864988 768,68.594969 926.41333,160.05496 1024,329.08002 1024,512 1024,694.91998 926.41339,863.94494 768.00006,955.40503 609.58673,1046.865 414.41339,1046.865 256,955.40503 97.58667,863.94507 0,694.91998 0,512 0,329.08002 97.586609,160.05502 255.99994,68.594999 335.2066,22.865004 423.60327,5.7220462E-06 511.99994,1.1368684E-13 z" 
                                              Fill="Gray"  
                                              Width="40"
                                              Height="40"
                                              Stretch="UniformToFill" />
                                     </Border>
-                                    <!--<ControlTemplate.Triggers>
-                                        
-                                    </ControlTemplate.Triggers>-->
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="Button.IsPressed" Value="true">
+                                            <Setter TargetName="btnBorder" Property="Background" Value="Green" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Button.Template>
 
                         </Button>
                         <TextBox Name="txt" 
-                                 Margin="2"
-                         TextChanged="Txt_TextChanged" 
-                             DockPanel.Dock="Left"
-                             MinWidth="300"
-                         Height="{Binding ElementName=lab,Path=ActualHeight}"/>
+                                 Margin="0,0,2,0"
+                                 TextChanged="Txt_TextChanged" 
+                                 DockPanel.Dock="Left"
+                                 MinWidth="300"
+                                 />
                     </DockPanel>
                 </Label>
             </Expander>
             <DataGrid DockPanel.Dock="Bottom" 
                       RowHeight="25"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserReorderColumns="False"
+                      VirtualizingStackPanel.IsVirtualizing="True"
                       MaxColumnWidth="300"
+                      AutoGeneratedColumns="DataGrid_AutoGeneratedColumns"
                       ItemsSource="{Binding}"
                       Name="dataGrid">
             </DataGrid>

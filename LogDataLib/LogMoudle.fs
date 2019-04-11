@@ -20,9 +20,9 @@ let mathcSometing str matc =
 
 let getItem str =
     let commandID = mathcSometing str mCommandID
-                   |> (fun str->str.Split(','))
-                   |> (fun strs->if strs.Length <> 1 then strs.[1] else strs.[0])
-                   |> (fun s -> s.Replace("  ",""))
+                   |> (fun str -> str.Split(','))
+                   |> (fun strs -> if strs.Length <> 1 then strs.[1] else strs.[0])
+                  
 
     let cmdType =  mathcSometing str mcmdType
                    |>(fun str->str.Split(':'))
@@ -40,16 +40,27 @@ let getItem str =
             |_ ->ActionMode.Null
     {
        Time = mathcSometing str mtime;
-       CommandID = CommandId;
+       CommandID = CommandId.Trim();
        JsonMsg = mathcSometing str mjson; 
        ServerID = mathcSometing str mserverID;
        Actionmode = act;
     }
 
+let SafeGetStr path =
+    try 
+         use fsm = File.Open(path,FileMode.Open,FileAccess.Read) 
+         let fsLen = (int)fsm.Length;
+         let heByte =  Array.create fsLen 0uy
+         let str=fsm.Read(heByte,0,fsLen)
+         System.Text.Encoding.UTF8.GetString(heByte)
+    with _ -> "null"
+
 let getMsgItems path=
-    File.ReadAllText(path)
+    path
+    |>SafeGetStr 
     |>Regex("\[Info\]:").Split
     |>Seq.map (fun info->getItem info)
+
 
 let getTbale items  =
     let table=new DataTable()
